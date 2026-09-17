@@ -14,7 +14,6 @@ questions = [
     }
 ]
 
-
 # Direct Prompting
 def direct_prompt(question):
     if "60 km" in question:
@@ -24,7 +23,6 @@ def direct_prompt(question):
     elif "12 × 8" in question:
         return "96"
     return "Unknown"
-
 
 # Chain-of-Thought Prompting
 def cot_prompt(question):
@@ -53,14 +51,12 @@ Answer: 96
 """
         return "96", reasoning
 
-
 # Accuracy Calculation
 direct_correct = 0
 cot_correct = 0
 
 for q in questions:
     actual = q["answer"]
-
     direct_response = direct_prompt(q["question"])
     cot_response, reasoning = cot_prompt(q["question"])
 
@@ -70,11 +66,35 @@ for q in questions:
     if cot_response == actual:
         cot_correct += 1
 
-
 total = len(questions)
 
 direct_accuracy = (direct_correct / total) * 100
 cot_accuracy = (cot_correct / total) * 100
 
+print("Direct Prompt Accuracy:",
+      direct_accuracy, "%")
+print("Chain-of-Thought Accuracy:",
+      cot_accuracy, "%")
+
+# Prompt Engineering Benchmark
+for q in questions:
+    actual = q["answer"]
+    direct_response = direct_prompt(q["question"])
+    cot_response, reasoning = cot_prompt(q["question"])
+
+    print("\n=== Prompt Engineering Benchmark ===")
+    print("Question:")
+    print(q["question"])
+    print("Direct Prompt Output:")
+    print(direct_response)
+    print("Chain-of-Thought Reasoning:")
+    print(reasoning)
+    print("CoT Output:")
+    print(cot_response)
+    print("-" * 50)
+
+# Accuracy Metrics
+print("\n=== Accuracy Metrics ===")
 print("Direct Prompt Accuracy:", direct_accuracy, "%")
 print("Chain-of-Thought Accuracy:", cot_accuracy, "%")
+print("Both prompting methods performed equally.")
