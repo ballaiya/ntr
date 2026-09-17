@@ -30,3 +30,23 @@ def ask_agent(query: Query):
         "question": query.question,
         "response": response
     }
+
+
+##Dockerfile
+FROM python:3.10
+
+WORKDIR /app
+
+COPY . /app
+
+RUN pip install fastapi uvicorn
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+#Build Docker Image
+docker build -t healthcare-agent .
+
+#Run Docker Container
+docker run -p 8000:8000 healthcare-agent
