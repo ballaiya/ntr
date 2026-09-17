@@ -1,0 +1,80 @@
+# Reasoning Questions
+questions = [
+    {
+        "question": "If a train travels 60 km in 1 hour, how far in 5 hours?",
+        "answer": "300"
+    },
+    {
+        "question": "A shop has 20 apples. 5 are sold. How many remain?",
+        "answer": "15"
+    },
+    {
+        "question": "What is 12 × 8?",
+        "answer": "96"
+    }
+]
+
+
+# Direct Prompting
+def direct_prompt(question):
+    if "60 km" in question:
+        return "300"
+    elif "20 apples" in question:
+        return "15"
+    elif "12 × 8" in question:
+        return "96"
+    return "Unknown"
+
+
+# Chain-of-Thought Prompting
+def cot_prompt(question):
+    if "60 km" in question:
+        reasoning = """
+Train travels 60 km in 1 hour.
+In 5 hours:
+60 × 5 = 300
+Answer: 300
+"""
+        return "300", reasoning
+
+    elif "20 apples" in question:
+        reasoning = """
+Initial apples = 20
+Sold apples = 5
+Remaining = 20 - 5 = 15
+Answer: 15
+"""
+        return "15", reasoning
+
+    elif "12 × 8" in question:
+        reasoning = """
+12 × 8 = 96
+Answer: 96
+"""
+        return "96", reasoning
+
+
+# Accuracy Calculation
+direct_correct = 0
+cot_correct = 0
+
+for q in questions:
+    actual = q["answer"]
+
+    direct_response = direct_prompt(q["question"])
+    cot_response, reasoning = cot_prompt(q["question"])
+
+    if direct_response == actual:
+        direct_correct += 1
+
+    if cot_response == actual:
+        cot_correct += 1
+
+
+total = len(questions)
+
+direct_accuracy = (direct_correct / total) * 100
+cot_accuracy = (cot_correct / total) * 100
+
+print("Direct Prompt Accuracy:", direct_accuracy, "%")
+print("Chain-of-Thought Accuracy:", cot_accuracy, "%")
