@@ -1,0 +1,44 @@
+# Rule-Based Reactive Agent
+def reactive_agent(scenario):
+    if scenario == "obstacle":
+        return "Turn Right"
+    elif scenario == "goal_visible":
+        return "Move Forward"
+    elif scenario == "danger":
+        return "Move Backward"
+    else:
+        return "Wait"
+
+
+# Deliberative Agent
+def deliberative_agent(scenario):
+    if scenario == "obstacle":
+        return "Analyze Paths -> Choose Safe Route"
+    elif scenario == "goal_visible":
+        return "Plan Shortest Path to Goal"
+    elif scenario == "danger":
+        return "Evaluate Risk -> Retreat Safely"
+    else:
+        return "Gather More Information"
+
+
+# Test Scenarios
+scenarios = [
+    "obstacle",
+    "goal_visible",
+    "danger",
+    "unknown"
+]
+
+
+# Decision Trace Logging
+print("=== AGENT DECISION ANALYSIS ===\n")
+
+for scenario in scenarios:
+    reactive_decision = reactive_agent(scenario)
+    deliberative_decision = deliberative_agent(scenario)
+
+    print("Scenario:", scenario)
+    print("Reactive Agent:", reactive_decision)
+    print("Deliberative Agent:", deliberative_decision)
+    print("-" * 50)
