@@ -1,0 +1,45 @@
+# Sample Database
+database = {
+    "AI": "Artificial Intelligence is the simulation of human intelligence.",
+    "ML": "Machine Learning is a subset of AI.",
+    "DL": "Deep Learning uses neural networks."
+}
+
+
+# MCP Database Tool
+def database_tool(query):
+    return database.get(
+        query,
+        "Record Not Found"
+    )
+
+
+# MCP Server
+class MCPServer:
+    def execute_tool(self, query):
+        print("[MCP Server] Calling Database Tool...")
+        result = database_tool(query)
+        return result
+
+
+# Orchestrator
+class Orchestrator:
+    def __init__(self, server):
+        self.server = server
+
+    def process(self, query):
+        print("[Orchestrator] Received Query")
+        response = self.server.execute_tool(query)
+        return response
+
+
+# Main Program
+server = MCPServer()
+orchestrator = Orchestrator(server)
+
+query = input("Enter Search Term: ")
+
+result = orchestrator.process(query)
+
+print("\nFinal Response:")
+print(result)
