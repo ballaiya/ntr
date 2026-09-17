@@ -1,0 +1,104 @@
+from typing import TypedDict
+from langgraph.graph import StateGraph, END
+
+
+# State Definition
+class AgentState(TypedDict):
+    query: str
+    research: str
+    confidence: float
+    final_answer: str
+
+
+# Research Node
+def research_node(state):
+    query = state["query"]
+
+    print("\nResearching:", query)
+
+    research_result = f"Research data collected for '{query}'"
+    confidence = 0.65
+
+    return {
+        "research": research_result,
+        "confidence": confidence
+    }
+
+
+# Additional Research Node
+def additional_research_node(state):
+    print("\nPerforming Additional Research...")
+
+    updated_research = (
+        state["research"]
+        + " + Additional verified sources collected"
+    )
+
+    updated_confidence = 0.92
+
+    return {
+        "research": updated_research,
+        "confidence": updated_confidence
+    }
+
+
+# Final Response Node
+def final_response_node(state):
+    print("\nGenerating Final Answer...")
+
+    answer = f"""
+Final Research Summary:
+{state['research']}
+
+Confidence Score:
+{state['confidence']}
+"""
+
+    return {
+        "final_answer": answer
+    }
+
+
+# Conditional Branching Logic
+def decision_function(state):
+    confidence = state["confidence"]
+
+    if confidence >= 0.80:
+        return "final"
+
+    return "additional"
+
+
+# Build LangGraph Workflow
+graph = StateGraph(AgentState)
+
+graph.add_node("research", research_node)
+graph.add_node("additional_research", additional_research_node)
+graph.add_node("final_response", final_response_node)
+
+graph.set_entry_point("research")
+
+graph.add_conditional_edges(
+    "research",
+    decision_function,
+    {
+        "additional": "additional_research",
+        "final": "final_response"
+    }
+)
+
+graph.add_edge("additional_research", "final_response")
+graph.add_edge("final_response", END)
+
+app = graph.compile()
+
+
+# Execute Workflow
+user_query = input("Enter Research Topic: ")
+
+result = app.invoke({
+    "query": user_query
+})
+
+print("\n=== FINAL OUTPUT ===")
+print(result["final_answer"])
