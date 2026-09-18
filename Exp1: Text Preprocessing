@@ -1,0 +1,63 @@
+import nltk
+import spacy
+from collections import Counter
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize, sent_tokenize
+
+# Download NLTK resources
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('punkt_tab')
+
+# Load spaCy English model
+nlp = spacy.load("en_core_web_sm")
+
+# Small corpus
+text = """
+Natural Language Processing (NLP) is a field of Artificial Intelligence.
+It helps computers understand human language.
+Text preprocessing is an important step in NLP.
+"""
+
+print("ORIGINAL TEXT:\n")
+print(text)
+
+# 1. Sentence Splitting
+sentences = sent_tokenize(text)
+
+print("\n1. SENTENCE SPLITTING:\n")
+for i, sentence in enumerate(sentences, start=1):
+    print(f"Sentence {i}: {sentence}")
+
+# 2. Tokenization
+tokens = word_tokenize(text)
+
+print("\n2. TOKENIZATION:\n")
+print(tokens)
+
+# 3. Stop-word Removal
+stop_words = set(stopwords.words('english'))
+
+filtered_tokens = [
+    word for word in tokens
+    if word.lower() not in stop_words and word.isalpha()
+]
+
+print("\n3. STOP-WORD REMOVAL:\n")
+print(filtered_tokens)
+
+# 4. Lemmatization using spaCy
+doc = nlp(" ".join(filtered_tokens))
+
+lemmatized_words = [token.lemma_ for token in doc]
+
+print("\n4. LEMMATIZATION:\n")
+print(lemmatized_words)
+
+# 5. Word Frequency Analysis
+word_freq = Counter(lemmatized_words)
+
+print("\n5. WORD FREQUENCY ANALYSIS:\n")
+
+for word, freq in word_freq.items():
+    print(f"{word} : {freq}")
