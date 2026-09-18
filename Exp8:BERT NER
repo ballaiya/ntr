@@ -1,0 +1,34 @@
+# Import pipeline
+from transformers import pipeline
+
+# Load pretrained BERT NER model
+ner = pipeline(
+    "ner",
+    model="dslim/bert-base-NER",
+    aggregation_strategy="simple"
+)
+
+# Input sentences
+sentences = [
+    "Sundar Pichai works at Google.",
+    "Elon Musk founded SpaceX.",
+    "Virat Kohli plays for India.",
+    "Bill Gates founded Microsoft."
+]
+
+# Perform NER
+for text in sentences:
+    print("\nSentence:")
+    print(text)
+
+    print("\nEntities Found:")
+    results = ner(text)
+
+    for r in results:
+        print(
+            "Word:", r["word"],
+            "| Entity:", r["entity_group"],
+            "| Score:", round(r["score"], 2)
+        )
+
+    print("-" * 40)
