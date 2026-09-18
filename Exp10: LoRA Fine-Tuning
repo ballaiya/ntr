@@ -1,0 +1,98 @@
+!pip install -q \
+transformers \
+datasets \
+accelerate \
+peft==0.10.0
+
+# Fine-Tuning Open Source LLM using LoRA
+from datasets import Dataset
+from transformers import (
+    AutoTokenizer,
+    AutoModelForCausalLM,
+    TrainingArguments,
+    Trainer
+)
+from peft import LoraConfig, get_peft_model
+
+# Small Custom Dataset
+data = {
+    "text": [
+        "Artificial Intelligence improves healthcare.",
+        "Machine learning is a subset of AI.",
+        "Transformers are powerful NLP models.",
+        "LoRA enables efficient fine-tuning."
+    ]
+}
+
+dataset = Dataset.from_dict(data)
+
+# Load Lightweight Open-Source Model
+model_name = "distilgpt2"
+
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer.pad_token = tokenizer.eos_token
+
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+# Apply LoRA
+lora_config = LoraConfig(
+    r=4,
+    lora_alpha=16,
+    target_modules=["c_attn"],
+    lora_dropout=0.1,
+    bias="none",
+    task_type="CAUSAL_LM"
+)
+
+model = get_peft_model(model, lora_config)
+
+# Tokenization
+def tokenize_function(example):
+    tokens = tokenizer(
+        example["text"],
+        padding="max_length",
+        truncation=True,
+        max_length=32
+    )
+    tokens["labels"] = tokens["input_ids"].copy()
+    return tokens
+
+tokenized_dataset = dataset.map(tokenize_function)
+
+# Training Arguments
+training_args = TrainingArguments(
+    output_dir="./results",
+    per_device_train_batch_size=2,
+    num_train_epochs=1,
+    logging_steps=1,
+    save_strategy="no",
+    report_to="none"
+)
+
+# Trainer
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=tokenized_dataset
+)
+
+# Train Model
+trainer.train()
+
+# Test the Fine-Tuned Model
+input_text = "Artificial Intelligence"
+
+inputs = tokenizer(input_text, return_tensors="pt")
+
+outputs = model.generate(
+    **inputs,
+    max_length=30
+)
+
+print("\nGenerated Output:\n")
+print(
+    tokenizer.decode(
+        outputs[0],
+        skip_special_tokens=True
+    )
+)
