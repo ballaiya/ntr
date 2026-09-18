@@ -1,0 +1,33 @@
+from gensim.models import Word2Vec
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+sentences = [
+    ['machine', 'learning', 'is', 'fun'],
+    ['deep', 'learning', 'uses', 'neural', 'networks'],
+    ['natural', 'language', 'processing', 'uses', 'transformers']
+]
+
+model = Word2Vec(
+    sentences,
+    vector_size=50,
+    window=3,
+    min_count=1,
+    sg=1
+)
+
+print(model.wv.most_similar('learning'))
+
+words = list(model.wv.index_to_key)
+X = model.wv[words]
+
+pca = PCA(n_components=2)
+result = pca.fit_transform(X)
+
+plt.figure(figsize=(8,6))
+
+for i, word in enumerate(words):
+    plt.scatter(result[i,0], result[i,1])
+    plt.text(result[i,0], result[i,1], word)
+
+plt.show()
