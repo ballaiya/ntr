@@ -1,0 +1,47 @@
+import math
+from collections import defaultdict
+
+# Training text
+train_text = "the cat sat on the mat the cat slept on the sofa"
+
+# Test text
+test_text = "the cat sat on the mat"
+
+# Tokenize text
+train_tokens = train_text.split()
+test_tokens = test_text.split()
+
+# Build Bigram Model
+unigram_counts = defaultdict(int)
+bigram_counts = defaultdict(int)
+
+for word in train_tokens:
+    unigram_counts[word] += 1
+
+for i in range(len(train_tokens) - 1):
+    bigram = (train_tokens[i], train_tokens[i + 1])
+    bigram_counts[bigram] += 1
+
+# Vocabulary size
+V = len(set(train_tokens))
+
+# Function to calculate bigram probability with Laplace smoothing
+def bigram_probability(w1, w2):
+    return (bigram_counts[(w1, w2)] + 1) / (unigram_counts[w1] + V)
+
+# Calculate Perplexity
+log_prob_sum = 0
+N = len(test_tokens) - 1
+
+for i in range(N):
+    prob = bigram_probability(test_tokens[i], test_tokens[i + 1])
+    log_prob_sum += math.log(prob)
+
+perplexity = math.exp(-log_prob_sum / N)
+
+print("Bigram Counts:")
+
+for k, v in bigram_counts.items():
+    print(f"{k}: {v}")
+
+print("\nPerplexity:", perplexity)
