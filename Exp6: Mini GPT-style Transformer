@@ -1,0 +1,72 @@
+import torch
+import torch.nn as nn
+
+# Sample text
+text = "hello world"
+
+# Vocabulary
+chars = list(set(text))
+stoi = {ch: i for i, ch in enumerate(chars)}
+itos = {i: ch for ch, i in stoi.items()}
+
+# Encode text
+data = torch.tensor([stoi[c] for c in text])
+x = data[:-1].unsqueeze(0)
+y = data[1:].unsqueeze(0)
+
+# GPT Model
+class MiniGPT(nn.Module):
+    def __init__(self, vocab_size):
+        super().__init__()
+        self.embed = nn.Embedding(vocab_size, 16)
+        self.transformer = nn.TransformerDecoder(
+            nn.TransformerDecoderLayer(
+                d_model=16,
+                nhead=2
+            ),
+            num_layers=1
+        )
+        self.fc = nn.Linear(16, vocab_size)
+
+    def forward(self, x):
+        x = self.embed(x)
+        out = self.transformer(x, x)
+        return self.fc(out)
+
+
+model = MiniGPT(len(chars))
+
+# Loss and optimizer
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+
+# Training
+for epoch in range(20):
+    out = model(x)
+    loss = loss_fn(
+        out.reshape(-1, len(chars)),
+        y.reshape(-1)
+    )
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    print("Epoch:", epoch + 1, "Loss:", loss.item())
+
+# Generate text
+inp = torch.tensor([[stoi['h']]])
+
+for i in range(10):
+    out = model(inp)
+    pred = torch.argmax(out[0, -1]).item()
+    inp = torch.cat(
+        [inp, torch.tensor([[pred]])],
+        dim=1
+    )
+
+# Decode output
+generated = "".join([itos[i] for i in inp[0].tolist()])
+
+print("\nGenerated Text:")
+print(generated)
