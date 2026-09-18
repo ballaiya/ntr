@@ -1,0 +1,40 @@
+import torch
+import matplotlib.pyplot as plt
+
+# Query, Key, Value matrices
+Q = torch.tensor([[1., 0., 1.]])
+
+K = torch.tensor([
+    [1., 0., 1.],
+    [0., 1., 0.],
+    [1., 1., 1.]
+])
+
+V = torch.tensor([
+    [10., 0.],
+    [0., 10.],
+    [5., 5.]
+])
+
+# Scaled Dot-Product Attention
+d_k = K.shape[1]
+
+scores = torch.matmul(Q, K.T) / (d_k ** 0.5)
+
+attention_weights = torch.softmax(scores, dim=-1)
+
+output = torch.matmul(attention_weights, V)
+
+print("Attention Weights:")
+print(attention_weights)
+
+print("\nAttention Output:")
+print(output)
+
+# Visualize Attention Weights
+plt.imshow(attention_weights.detach().numpy(), cmap="viridis")
+plt.colorbar()
+plt.title("Attention Weights")
+plt.xlabel("Keys")
+plt.ylabel("Query")
+plt.show()
