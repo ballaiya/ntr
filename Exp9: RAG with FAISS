@@ -1,0 +1,32 @@
+from sentence_transformers import SentenceTransformer
+import faiss
+
+# Documents
+docs = [
+    "Python is a programming language",
+    "FAISS is used for document retrieval",
+    "Machine Learning is a part of AI"
+]
+
+# Load embedding model
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
+# Convert documents to embeddings
+doc_vectors = model.encode(docs)
+
+# Create FAISS index
+index = faiss.IndexFlatL2(doc_vectors.shape[1])
+index.add(doc_vectors)
+
+# User query
+query = "What is FAISS?"
+
+# Convert query to embedding
+query_vector = model.encode([query])
+
+# Search similar document
+D, I = index.search(query_vector, 1)
+
+# Retrieve result
+print("Query:", query)
+print("Retrieved Document:", docs[I[0][0]])
